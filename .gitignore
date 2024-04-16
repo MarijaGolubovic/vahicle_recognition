@@ -13,3 +13,4 @@ test_video2.mkv
 train.py
 train/
 valid/
+pytorch_env/
