@@ -99,15 +99,15 @@ def get_valid_transform():
     })
 
 
-def save_model(epoch, model, optimizer):
+def save_model(epoch, model, optimizer, save_path):
     torch.save({
                 'epoch': epoch+1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                }, 'outputs/last_model.pth')
+                }, f'{save_path}/last_model.pth')
 
 def save_loss_plot(
-    OUT_DIR, 
+    save_path, 
     train_loss_list, 
     x_label='iterations',
     y_label='train loss',
@@ -124,10 +124,10 @@ def save_loss_plot(
     train_ax.plot(train_loss_list, color='tab:blue')
     train_ax.set_xlabel(x_label)
     train_ax.set_ylabel(y_label)
-    figure_1.savefig(f"{OUT_DIR}/{save_name}.png")
+    figure_1.savefig(f"{save_path}/{save_name}.png")
     print('SAVING PLOTS COMPLETE...')
 
-def save_mAP(OUT_DIR, map_05, map):
+def save_mAP(save_path, map_05, map):
     """
     Saves the mAP@0.5 and mAP@0.5:0.95 per epoch.
     :param OUT_DIR: Path to save the graphs.
@@ -147,5 +147,5 @@ def save_mAP(OUT_DIR, map_05, map):
     ax.set_xlabel('Epochs')
     ax.set_ylabel('mAP')
     ax.legend()
-    figure.savefig(f"{OUT_DIR}/map.png")
+    figure.savefig(f"{save_path}/map.png")
 

@@ -46,15 +46,10 @@ class SaveBestModel:
     model state.
     """
     def __init__(
-        self, best_valid_map=float(0)
+        self, path, best_valid_map=float(0)
     ):
         self.best_valid_map = best_valid_map
-
-        current_time = datetime.now()
-        self.folder_name = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-
-        path = OUT_DIR + "/" + self.folder_name
-        os.makedirs(path, exist_ok=True)
+        self.save_path = path
         
     def __call__(
         self, 
@@ -70,7 +65,7 @@ class SaveBestModel:
             torch.save({
                 'epoch': epoch+1,
                 'model_state_dict': model.state_dict(),
-                }, f"{OUT_DIR}/{self.folder_name}/best_model.pth")
+                }, f"{self.save_path}/best_model.pth")
 
 
 
@@ -84,6 +79,13 @@ def main(args):
         video(args.show)
 
     elif args.train:
+        current_time = datetime.now()
+        folder_name = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+        save_path = OUT_DIR + "/" + folder_name
+        os.makedirs(save_path, exist_ok=True)
+
+
         os.makedirs('outputs', exist_ok=True)
         train_dataset = create_train_dataset(TRAIN_DIR)
         valid_dataset = create_valid_dataset(VALID_DIR)
@@ -117,7 +119,7 @@ def main(args):
         map_list = []
 
         MODEL_NAME = 'model'
-        save_best_model = SaveBestModel()
+        save_best_model = SaveBestModel(save_path)
 
         
         for epoch in range(NUM_EPOCHS):
@@ -143,11 +145,11 @@ def main(args):
                 model, float(metric_summary['map']), epoch, 'outputs'
             )
 
-            save_model(epoch, model, optimizer)
+            save_model(epoch, model, optimizer, save_path)
 
-            save_loss_plot(OUT_DIR, train_loss_list)
+            save_loss_plot(save_path, train_loss_list)
 
-            save_mAP(OUT_DIR, map_50_list, map_list)
+            save_mAP(save_path, map_50_list, map_list)
             scheduler.step()
 
 if __name__ == '__main__':
