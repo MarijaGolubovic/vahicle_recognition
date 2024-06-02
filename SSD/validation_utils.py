@@ -1,4 +1,4 @@
-from training_setup import create_model
+from ssd_training_utils import create_model
 from config import NUM_CLASSES, DEVICE, CLASSES
 
 from torcheval.metrics.functional import multiclass_f1_score
@@ -189,14 +189,14 @@ def get_metrics(test_loader):
             all_predictions.extend(sorted_detected_labels)
     
 
-    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average=None)
+    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average=None, zero_division=0)
     for i, class_name in enumerate(CLASSES):
         if i == 0:
             continue
         print(f"Class: {class_name}")
         print(f"\t Precision: {precision[i]}\n\t Recall: {recall[i]}\n\t F1 Score: {f1_score[i]}")
     
-    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average='weighted')
+    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average='weighted', zero_division=0)
     print(f"\nAverage metrics for each classes: \n\t Precision: {precision}\n\t Recall: {recall}\n\t F1 Score: {f1_score}\n")
 
 

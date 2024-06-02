@@ -1,6 +1,6 @@
 from config import CLASSES, DEVICE, RESIZE_TO, BATCH_SIZE
 from torch.utils.data import Dataset, DataLoader
-from training_setup import get_valid_transform, collate_fn, get_train_transform
+from ssd_training_utils import get_valid_transform, collate_fn, get_train_transform
 
 import glob as glob
 import os, pathlib, cv2
