@@ -72,4 +72,16 @@ python3 ssd_detection.py --train
 If you want change number of epochs add argument `--epochs num_epochs`. Training result will be saved in directory with current data time. If you want validate trained model should be copy best_model.pth in `outpusts/` directory.
 
 
-### Performances (model trained on large dataset by 200 epochs)
+### Evaluation Metrics (model trained on large dataset by 200 epochs)
+
+| Class   | Precision | Recall | F1 Score |
+|---------|-----------|--------|----------|
+| bus     | 0.7875    | 0.7241 | 0.7545   |
+| car     | 0.9664    | 0.8895 | 0.9264   |
+| truck   | 0.5       | 0.25   | 0.3333   |
+
+**Average Metrics for All Classes:**
+- Precision: 0.9425
+- Recall: 0.8664
+- F1 Score: 0.9027
+
