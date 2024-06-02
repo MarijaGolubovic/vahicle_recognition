@@ -5,8 +5,9 @@ cars.v2i.voc.zip
 cars.v3i.voc.zip
 cars.v7i.voc.zip
 inference_outputs/
-output/
-outputs/
+outputs/map.png
+outputs/train_loss.png
+outputs/last_model.pth
 test/
 test_video1.mkv
 test_video2.mkv
@@ -14,3 +15,4 @@ train.py
 train/
 valid/
 pytorch_env/
+__pycache__/
