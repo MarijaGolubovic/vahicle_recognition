@@ -5,7 +5,7 @@ CLASSES = [
 ]
 NUM_CLASSES  = len(CLASSES)
 RESIZE_TO = 640
-NUM_EPOCHS = 1
+NUM_EPOCHS = 200
 
 OUT_DIR = 'outputs'
 TRAIN_DIR  = "train"
