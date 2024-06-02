@@ -20,16 +20,16 @@ pip3 install -r requirements.txt
 
 ### Dataset
 ##### Small Dataset:
-    *Train set: 309 images
-    *Valid set: 88 images
-    *Test set: 43 images
+    * Train set: 309 images
+    * Valid set: 88 images
+    * Test set: 43 images
 
 [Download small dataset](https://app.roboflow.com/carstracksbus/cars-ljnwr/1)
 
 ##### Large Dataset:
-    *Train set: 610 images
-    *Valid set: 120 images
-    *Test set: 70 images
+    * Train set: 610 images
+    * Valid set: 120 images
+    * Test set: 70 images
 
 [Download large dataset](https://app.roboflow.com/carstracksbus/cars-ljnwr/11)
 
@@ -73,7 +73,7 @@ If you want change number of epochs add argument `--epochs num_epochs`. Training
 
 
 
-
+<br/> <br/>
 
 ## Evaluation Metrics (model trained on large dataset by 200 epochs)
 
