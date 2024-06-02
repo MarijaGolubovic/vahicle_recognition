@@ -51,6 +51,9 @@ pip3 install -r requirements.txt
 |---- video*.mp4
 ```
 
+**Rename `best_model_large.pth` or `best_model_small.pth` to `best_model.pth`**
+<br/>
+
 ### Validate model on video
 Add path video  to function `video()` inside `validation_utils.py`.
 ```
