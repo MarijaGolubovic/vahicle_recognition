@@ -38,7 +38,7 @@ pip3 install -r requirements.txt
 ```
 
 ### Validate model on video
-Add path video  to function `video` inside `validation_utils.py`.
+Add path video  to function `video()` inside `validation_utils.py`.
 ```
  python3 ssd_detection.py --detect
 ```
