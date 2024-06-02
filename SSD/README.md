@@ -11,7 +11,7 @@ git clone https://github.com/MarijaGolubovic/vahicle_recognition.git && cd vahic
 
 Create a python3 virtual environment
 ```
-python3 -m venv pytorch_env && source activate pytorch_env/bin/activate
+python3 -m venv pytorch_env && source pytorch_env/bin/activate
 ```
 Install dependencies
 ```
@@ -38,6 +38,7 @@ pip3 install -r requirements.txt
 ```
 
 ### Validate model on video
+Add path video  to function `video` inside `validation_utils.py`.
 ```
  python3 ssd_detection.py --detect
 ```
@@ -55,4 +56,5 @@ If you want see detection result add argument `--show`
 python3 ssd_detection.py --train
 ```
 If you want change number of epochs add argument `--epochs num_epochs`. Training result will be saved in directory with current data time. If you want validate trained model should be copy best_model.pth in `outpusts/` directory.
+
 
