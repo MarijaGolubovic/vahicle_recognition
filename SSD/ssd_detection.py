@@ -121,7 +121,7 @@ def main(args):
         MODEL_NAME = 'model'
         save_best_model = SaveBestModel(save_path)
 
-        
+        NUM_EPOCHS = args.epochs
         for epoch in range(NUM_EPOCHS):
             print(f"\nEPOCH {epoch+1} of {NUM_EPOCHS}")
 
@@ -158,6 +158,7 @@ if __name__ == '__main__':
     parser.add_argument('--train', action='store_true', help='Run training mode')
     parser.add_argument('--eval', action='store_true', help='Run evaluation mode')
     parser.add_argument('--show', action='store_true', help='Show detection result')
+    parser.add_argument('--epochs', type=int, default=NUM_EPOCHS, help='Number of epochs for training') 
 
     args = parser.parse_args()
 
