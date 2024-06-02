@@ -1,7 +1,7 @@
 # Vahicule detection by SSD model
 
 >[!IMPORTANT]
->This isntructions is for Linux OS
+>This instructions is for Linux OS
 
 ### Installation
 Download our source code:
@@ -9,7 +9,7 @@ Download our source code:
 git clone https://github.com/MarijaGolubovic/vahicle_recognition.git && cd vahicle_recognition/SSD
 ```
 
-Create a python3 virtual environment ()
+Create a python3 virtual environment
 ```
 python3 -m venv pytorch_env && source activate pytorch_env/bin/activate
 ```
@@ -41,7 +41,7 @@ pip3 install -r requirements.txt
 ```
  python3 ssd_detection.py --detect
 ```
-If you want see detection result add argument `--show`.  Output video will be save in inference_outputs with suffix who presen current data and time. 
+If you want see detection result add argument `--show`.  Output video will be save in 'inference_outputs/videos' with suffix who presen current data and time. 
 
 ### Evaluate trained model on test data set
 
