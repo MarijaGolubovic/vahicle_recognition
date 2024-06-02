@@ -1,5 +1,5 @@
 from ssd_training_utils import create_model
-from config import NUM_CLASSES, DEVICE, CLASSES
+from config import NUM_CLASSES, DEVICE, CLASSES, RESIZE_TO
 
 from torcheval.metrics.functional import multiclass_f1_score
 from sklearn.metrics import precision_recall_fscore_support
@@ -44,7 +44,7 @@ def validate(valid_data_loader, model):
     metric_summary = metric.compute()
     return metric_summary
 
-def video():
+def video(show_detection_result):
     os.makedirs('inference_outputs/videos', exist_ok=True)
 
     COLORS = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
@@ -77,9 +77,11 @@ def video():
     # Read until end of video.
     while(cap.isOpened()):
         ret, frame = cap.read()
+        # frame = cv2.resize(frame, (RESIZE_TO, RESIZE_TO))
+
         if ret:
             image = frame.copy()
-            
+
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
             # Make the pixel range between 0 and 1.
             image /= 255.0
@@ -136,6 +138,9 @@ def video():
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 
                         2, lineType=cv2.LINE_AA)
             print("------------------", iterator)
+            if show_detection_result:
+                cv2.imshow('Detection result', frame)
+                cv2.waitKey(1)
             iterator+=1
             out.write(frame)
         else:
@@ -154,7 +159,7 @@ def pad_lists(preds, targets):
     return padded_preds, padded_targets
 
 
-def get_metrics(test_loader):
+def get_metrics(test_loader, show_detection_result):
     model = create_model(num_classes=NUM_CLASSES, size=640)
     checkpoint = torch.load('outputs/best_model.pth', map_location=DEVICE)
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -179,7 +184,7 @@ def get_metrics(test_loader):
             image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
             
             # Detect vahicules on input image
-            _, detected_boxes_labels = detect_vahicule_on_image(image, model, DEVICE, CLASSES)
+            _, detected_boxes_labels = detect_vahicule_on_image(image, model, DEVICE, CLASSES, show_detection_result)
             detected_boxes_labels.sort(key=lambda x: (x[1], x[0]))  # Sort by ymin first, then xmin
 
             sorted_detected_labels = [class_to_index[class_name] for _, _, _, _, class_name in detected_boxes_labels]
@@ -200,7 +205,7 @@ def get_metrics(test_loader):
     print(f"\nAverage metrics for each classes: \n\t Precision: {precision}\n\t Recall: {recall}\n\t F1 Score: {f1_score}\n")
 
 
-def detect_vahicule_on_image(image, model, device, classes, detection_threshold=0.25):
+def detect_vahicule_on_image(image, model, device, classes, show_detection_result, detection_threshold=0.25):
     COLORS = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
     
     model.to(device).eval()
@@ -255,7 +260,8 @@ def detect_vahicule_on_image(image, model, device, classes, detection_threshold=
                         2, 
                         lineType=cv2.LINE_AA)
             detected_boxes_labels.append((xmin, ymin, xmax, ymax, class_name))
-    cv2.imshow('Detected objects', result_image)
-    cv2.waitKey(0)
+    if show_detection_result:
+        cv2.imshow('Detected objects', result_image)
+        cv2.waitKey(1)
     return result_image, detected_boxes_labels
 

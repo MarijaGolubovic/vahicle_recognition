@@ -67,30 +67,16 @@ class SaveBestModel:
 
 
 
-def main():
-    test_dataset = create_test_dataset(TEST_DIR)
-    test_loader = create_test_loader(test_dataset, NUM_WORKERS)
+def main(args):
+    if args.eval:
+        test_dataset = create_test_dataset(TEST_DIR)
+        test_loader = create_test_loader(test_dataset, NUM_WORKERS)
+        get_metrics(test_loader, args.show)
 
-    get_metrics(test_loader)
-    
-    parser = argparse.ArgumentParser()
+    elif args.detect:
+        video(args.show)
 
-    parser.add_argument(
-        '--detect', 
-        default=False,
-        type=bool,
-        help='run training mode'
-    )
-
-    parser.add_argument('--train', type=bool, default=False, help='detection mode')
-
-    args, _ = parser.parse_known_args()
-    print(args.detect, type(args.detect), args)
-    evaluation = args.detect
-    print(evaluation, type(evaluation), args)
-    if True:
-        video()
-    else:
+    elif args.train:
         os.makedirs('outputs', exist_ok=True)
         train_dataset = create_train_dataset(TRAIN_DIR)
         valid_dataset = create_valid_dataset(VALID_DIR)
@@ -158,4 +144,12 @@ def main():
             scheduler.step()
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description="Train and evaluate SSD model", add_help=True)
+    parser.add_argument('--detect', action='store_true', help='Run detection mode')
+    parser.add_argument('--train', action='store_true', help='Run training mode')
+    parser.add_argument('--eval', action='store_true', help='Run evaluation mode')
+    parser.add_argument('--show', action='store_true', help='Show detection result')
+
+    args = parser.parse_args()
+
+    main(args)
