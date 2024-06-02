@@ -1,7 +1,7 @@
 # Vahicule detection by SSD model
 
-[!IMPORTANT]
-This isntructions is for Linux OS
+>[!IMPORTANT]
+>This isntructions is for Linux OS
 
 ### Installation
 Download our source code:
@@ -34,6 +34,7 @@ pip3 install -r requirements.txt
 |---- train/
 |---- valid/
 |---- test/
+|---- video*.mp4
 ```
 
 ### Validate model on video
@@ -43,6 +44,7 @@ pip3 install -r requirements.txt
 If you want see detection result add argument `--show`.  Output video will be save in inference_outputs with suffix who presen current data and time. 
 
 ### Evaluate trained model on test data set
+
 ```
     python3 ssd_detection.py --eval
 ```
