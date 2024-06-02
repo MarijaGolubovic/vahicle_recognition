@@ -3,7 +3,7 @@
 >[!IMPORTANT]
 >This instructions is for Linux OS
 
-### Installation
+## Installation
 Download our source code:
 ```
 git clone https://github.com/MarijaGolubovic/vahicle_recognition.git && cd vahicle_recognition/SSD
@@ -72,7 +72,7 @@ python3 ssd_detection.py --train
 If you want change number of epochs add argument `--epochs num_epochs`. Training result will be saved in directory with current data time. If you want validate trained model should be copy best_model.pth in `outpusts/` directory.
 
 
-### Evaluation Metrics (model trained on large dataset by 200 epochs)
+## Evaluation Metrics (model trained on large dataset by 200 epochs)
 
 | Class   | Precision | Recall | F1 Score |
 |---------|-----------|--------|----------|
