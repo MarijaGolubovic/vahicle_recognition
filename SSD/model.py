@@ -7,7 +7,8 @@ from torch.optim.lr_scheduler import MultiStepLR
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from albumentations.pytorch import ToTensorV2
 from torcheval.metrics.functional import multiclass_f1_score
-from sklearn.metrics import classification_report
+from sklearn.metrics import precision_recall_fscore_support
+
 
 import torch
 import cv2, time
@@ -294,6 +295,7 @@ def create_train_loader(train_dataset, num_workers=0):
         drop_last=False
     )
     return train_loader
+
 def create_valid_loader(valid_dataset, num_workers=0):
     valid_loader = DataLoader(
         valid_dataset,
@@ -305,35 +307,22 @@ def create_valid_loader(valid_dataset, num_workers=0):
     )
     return valid_loader
 
+def create_test_dataset(DIR):
+    test_dataset = CustomDataset(
+        DIR, RESIZE_TO, RESIZE_TO, CLASSES, get_valid_transform()
+    )
+    return test_dataset
 
-# if __name__ == '__main__':
-#     dataset = CustomDataset(
-#         TRAIN_DIR, RESIZE_TO, RESIZE_TO, CLASSES
-#     )
-    
-#     # function to visualize a single sample
-#     def visualize_sample(image, target):
-#         for box_num in range(len(target['boxes'])):
-#             box = target['boxes'][box_num]
-#             label = CLASSES[target['labels'][box_num]]
-#             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-#             cv2.rectangle(
-#                 image, 
-#                 (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
-#                 (0, 0, 255), 
-#                 2
-#             )
-#             cv2.putText(
-#                 image, 
-#                 label, 
-#                 (int(box[0]), int(box[1]-5)), 
-#                 cv2.FONT_HERSHEY_SIMPLEX, 
-#                 0.7, 
-#                 (0, 0, 255), 
-#                 2
-#             )
-#         cv2.imshow('Image', image)
-#         cv2.waitKey(0)
+def create_test_loader(test_dataset, num_workers=0):
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        num_workers=num_workers,
+        collate_fn=collate_fn,
+        drop_last=False
+    )
+    return test_loader
 
 def create_model(num_classes=91, size=300):
 
@@ -525,49 +514,6 @@ def video():
     avg_fps = total_fps / frame_count
     print(f"Average FPS: {avg_fps:.3f}")
 
-def create_test_dataset(DIR):
-    test_dataset = CustomDataset(
-        DIR, RESIZE_TO, RESIZE_TO, CLASSES, get_valid_transform()
-    )
-    return test_dataset
-
-def create_test_loader(test_dataset, num_workers=0):
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=BATCH_SIZE,
-        shuffle=False,
-        num_workers=num_workers,
-        collate_fn=collate_fn,
-        drop_last=False
-    )
-    return test_loader
-
-def get_labels_from_test_loader_ex(test_loader):
-    model = create_model(num_classes=NUM_CLASSES, size=640)
-    checkpoint = torch.load('outputs/best_model.pth', map_location=DEVICE)
-    model.load_state_dict(checkpoint['model_state_dict'])
-
-
-    for images, targets in test_loader:
-        for image, target in zip(images, targets):
-            labels = target['labels'].tolist()
-            print("labele",labels)
-
-            image_np = image.permute(1, 2, 0).cpu().numpy() * 255
-            image_np = image_np.astype(np.uint8)
-            image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-
-            result_image = detect_vahicule(image, model, DEVICE, CLASSES)
-
-            cv2.imshow("sjjddd", result_image)
-            cv2.waitKey(0)
-
-
-def pad_tensors(preds, targets):
-    max_length = max(len(preds), len(targets))
-    padded_preds = torch.nn.functional.pad(preds, (0, max_length - len(preds)))
-    padded_targets = torch.nn.functional.pad(targets, (0, max_length - len(targets)))
-    return padded_preds, padded_targets
 
 def pad_lists(preds, targets):
     max_length = max(len(preds), len(targets))
@@ -575,80 +521,6 @@ def pad_lists(preds, targets):
     padded_targets = targets + [0] * (max_length - len(targets))
     return padded_preds, padded_targets
 
-def get_f1_score(preds, targets):
-    
-    targets = torch.tensor(targets)
-    preds = torch.tensor(preds)
-
-    preds_, targets_  = pad_tensors(preds, targets)
-
-    f1_score = multiclass_f1_score(preds_, targets_, num_classes=NUM_CLASSES, average='weighted')
-
-    return f1_score
-
-def get_labels_from_test_loader_old(test_loader):
-    model = create_model(num_classes=NUM_CLASSES, size=640)
-    checkpoint = torch.load('outputs/best_model.pth', map_location=DEVICE)
-    model.load_state_dict(checkpoint['model_state_dict'])
-
-    sorted_detected_labels_all_images = []
-    sorted_input_labels_all_images = []
-    class_to_index = {'bus': 1, 'car': 2, 'truck': 3}
-
-    number_of_samples = 0
-    f1_sum = 0
-
-    class_names = ['background', 'bus', 'car', 'truck']
-    
-    for images, targets in test_loader:
-        for image, target in zip(images, targets):
-            labels = target['labels'].tolist()
-            boxes = target['boxes'].tolist()
-
-            # Combine labels and boxes
-            labels_and_boxes = list(zip(labels, boxes))
-
-            # Sort combined labels and boxes by (ymin, xmin)
-            labels_and_boxes.sort(key=lambda x: (x[1][1], x[1][0]))  # Sort by ymin first, then xmin
-
-            # Extract sorted labels
-            sorted_input_labels = [label for label, box in labels_and_boxes]
-            
-            # sorted_input_labels_all_images.append(sorted_input_labels)
-
-            image_np = image.permute(1, 2, 0).cpu().numpy() * 255
-            image_np = image_np.astype(np.uint8)
-            image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-
-            result_image, detected_boxes_labels = detect_vahicule(image, model, DEVICE, CLASSES)
-
-            # Sort detected boxes and labels by (ymin, xmin)
-            detected_boxes_labels.sort(key=lambda x: (x[1], x[0]))  # Sort by ymin first, then xmin
-
-            sorted_detected_labels = [class_to_index[class_name] for _, _, _, _, class_name in detected_boxes_labels]
-            # sorted_detected_labels_all_images.append(sorted_detected_labels)
-
-            # targets_ = torch.tensor(sorted_input_labels)
-            # preds_ = torch.tensor(sorted_detected_labels)
-
-            # preds_, targets_  = pad_tensors(preds_, targets_)
-
-
-            f1_score = get_f1_score(sorted_detected_labels, sorted_input_labels)
-            f1_sum +=f1_score
-            number_of_samples +=1
-            
-            print(f"F1 Score: {f1_score}")
-            
-            # print("F1 scores for each class:", f1_scores)
-
-            # cv2.imshow("sjjddd", result_image)
-            # cv2.waitKey(0)
-    print("F1 score for test dataset:  ", f1_sum/number_of_samples)
-    # return sorted_input_labels_all_images, sorted_detected_labels_all_images
-
-
-from sklearn.metrics import precision_recall_fscore_support
 
 def get_labels_from_test_loader(test_loader):
     model = create_model(num_classes=NUM_CLASSES, size=640)
@@ -664,10 +536,7 @@ def get_labels_from_test_loader(test_loader):
             labels = target['labels'].tolist()
             boxes = target['boxes'].tolist()
 
-            # Combine labels and boxes
             labels_and_boxes = list(zip(labels, boxes))
-
-            # Sort combined labels and boxes by (ymin, xmin)
             labels_and_boxes.sort(key=lambda x: (x[1][1], x[1][0]))  # Sort by ymin first, then xmin
 
             # Extract sorted labels
@@ -676,19 +545,18 @@ def get_labels_from_test_loader(test_loader):
             image_np = image.permute(1, 2, 0).cpu().numpy() * 255
             image_np = image_np.astype(np.uint8)
             image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-
-            _, detected_boxes_labels = detect_vahicule(image, model, DEVICE, CLASSES)
-
-            # Sort detected boxes and labels by (ymin, xmin)
+            
+            # Detect vahicules on input image
+            _, detected_boxes_labels = detect_vahicule_on_image(image, model, DEVICE, CLASSES)
             detected_boxes_labels.sort(key=lambda x: (x[1], x[0]))  # Sort by ymin first, then xmin
 
             sorted_detected_labels = [class_to_index[class_name] for _, _, _, _, class_name in detected_boxes_labels]
             sorted_detected_labels, sorted_input_labels = pad_lists(sorted_detected_labels, sorted_input_labels)
+            
             all_targets.extend(sorted_input_labels)
             all_predictions.extend(sorted_detected_labels)
     
-    
-    # Compute precision, recall, and F1 score for each class
+
     precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average=None)
     for i, class_name in enumerate(CLASSES):
         if i == 0:
@@ -700,68 +568,7 @@ def get_labels_from_test_loader(test_loader):
     print(f"\nAverage metrics for each classes: \n\t Precision: {precision}\n\t Recall: {recall}\n\t F1 Score: {f1_score}\n")
 
 
-def detect_vahicule_ex(image, model, device, classes, detection_threshold=0.25):
-    
-    COLORS = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
-    # image = cv2.imread("/home/marija/vahicle_recognition/SSD/test/1711098625-4207957_jpg.rf.4b36df8d93989e88b54d77f6170c3b44.jpg")
-    
-    model.to(device).eval()
-    
-    # Normalize image
-    image_normalized = image.astype(np.float32) / 255.0
-    
-    # Bring color channels to front (H, W, C) => (C, H, W).
-    image_input = np.transpose(image_normalized, (2, 0, 1)).astype(np.float32)
-    image_input = torch.tensor(image_input, dtype=torch.float)
-    image_input = torch.unsqueeze(image_input, 0)
-    
-    # Predictions
-    with torch.no_grad():
-        outputs = model(image_input.to(device))
-    
-    # Load all detection to CPU for further operations.
-    outputs = [{k: v.to('cpu') for k, v in t.items()} for t in outputs]
-    
-    result_image = image.copy()
-    # Carry further only if there are detected boxes.
-    if len(outputs[0]['boxes']) != 0:
-        boxes = outputs[0]['boxes'].data.numpy()
-        scores = outputs[0]['scores'].data.numpy()
-        # Filter out boxes according to `detection_threshold`.
-        boxes = boxes[scores >= detection_threshold].astype(np.int32)
-        draw_boxes = boxes.copy()
-        # Get all the predicted class names.
-        pred_classes = [classes[i] for i in outputs[0]['labels'].cpu().numpy()]
-        num_of_cars = 0
-        # Draw the bounding boxes and write the class name on top of it.
-        for j, box in enumerate(draw_boxes):
-            class_name = pred_classes[j]
-            num_of_cars+=1
-            color = COLORS[classes.index(class_name)]
-            # Rescale boxes.
-            xmin = int((box[0] / image.shape[1]) * result_image.shape[1])
-            ymin = int((box[1] / image.shape[0]) * result_image.shape[0])
-            xmax = int((box[2] / image.shape[1]) * result_image.shape[1])
-            ymax = int((box[3] / image.shape[0]) * result_image.shape[0])
-            cv2.rectangle(result_image,
-                          (xmin, ymin),
-                          (xmax, ymax),
-                          color[::-1], 
-                          3)
-            cv2.putText(result_image, 
-                        class_name, 
-                        (xmin, ymin-5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 
-                        0.8, 
-                        color[::-1], 
-                        2, 
-                        lineType=cv2.LINE_AA)
-            return result_image
-        print(num_of_cars)
-    return result_image
-
-
-def detect_vahicule(image, model, device, classes, detection_threshold=0.25):
+def detect_vahicule_on_image(image, model, device, classes, detection_threshold=0.25):
     COLORS = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
     
     model.to(device).eval()
@@ -774,30 +581,29 @@ def detect_vahicule(image, model, device, classes, detection_threshold=0.25):
     image_input = torch.tensor(image_input, dtype=torch.float)
     image_input = torch.unsqueeze(image_input, 0)
     
-    # Predictions
     with torch.no_grad():
         outputs = model(image_input.to(device))
     
-    # Load all detection to CPU for further operations.
     outputs = [{k: v.to('cpu') for k, v in t.items()} for t in outputs]
     
     result_image = image.copy()
     detected_boxes_labels = []
-    # Carry further only if there are detected boxes.
+    
     if len(outputs[0]['boxes']) != 0:
         boxes = outputs[0]['boxes'].data.numpy()
         scores = outputs[0]['scores'].data.numpy()
-        # Filter out boxes according to `detection_threshold`.
+    
         boxes = boxes[scores >= detection_threshold].astype(np.int32)
         draw_boxes = boxes.copy()
-        # Get all the predicted class names.
+    
         pred_classes = [classes[i] for i in outputs[0]['labels'].cpu().numpy()]
         num_of_cars = 0
-        # Draw the bounding boxes and write the class name on top of it.
+    
         for j, box in enumerate(draw_boxes):
             class_name = pred_classes[j]
             num_of_cars += 1
             color = COLORS[classes.index(class_name)]
+    
             # Rescale boxes.
             xmin = int((box[0] / image.shape[1]) * result_image.shape[1])
             ymin = int((box[1] / image.shape[0]) * result_image.shape[0])
@@ -881,7 +687,7 @@ if __name__ == '__main__':
         MODEL_NAME = 'model'
         save_best_model = SaveBestModel()
 
-        # Training loop.
+        
         for epoch in range(NUM_EPOCHS):
             print(f"\nEPOCH {epoch+1} of {NUM_EPOCHS}")
 
