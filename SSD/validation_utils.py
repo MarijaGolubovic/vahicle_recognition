@@ -7,6 +7,7 @@ from torchmetrics.detection.mean_ap import MeanAveragePrecision
 import torch
 import numpy as np
 import cv2, os, time
+from datetime import datetime
 
 from tqdm.auto import tqdm
 
@@ -64,7 +65,10 @@ def video(show_detection_result):
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
 
-    save_name = str(video_name).split(os.path.sep)[-1].split('.')[0] + "najnoviji"
+    current_time = datetime.now()
+    current_run = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+    save_name = str(video_name).split(os.path.sep)[-1].split('.')[0] + '_' + current_run
     print(save_name)
     
     out = cv2.VideoWriter(f"inference_outputs/videos/{save_name}.mp4", 
