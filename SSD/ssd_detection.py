@@ -49,10 +49,12 @@ class SaveBestModel:
         self, best_valid_map=float(0)
     ):
         self.best_valid_map = best_valid_map
-        
+
         current_time = datetime.now()
         self.folder_name = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-        os.makedirs(self.folder_name, exist_ok=True)
+
+        path = OUT_DIR + "/" + self.folder_name
+        os.makedirs(path, exist_ok=True)
         
     def __call__(
         self, 
