@@ -13,6 +13,7 @@ import time
 import numpy as np
 import os
 import argparse
+from datetime import datetime
 
 
 
@@ -49,6 +50,10 @@ class SaveBestModel:
     ):
         self.best_valid_map = best_valid_map
         
+        current_time = datetime.now()
+        self.folder_name = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+        os.makedirs(self.folder_name, exist_ok=True)
+        
     def __call__(
         self, 
         model, 
@@ -63,7 +68,7 @@ class SaveBestModel:
             torch.save({
                 'epoch': epoch+1,
                 'model_state_dict': model.state_dict(),
-                }, f"{OUT_DIR}/best_model.pth")
+                }, f"{OUT_DIR}/{self.folder_name}/best_model.pth")
 
 
 
