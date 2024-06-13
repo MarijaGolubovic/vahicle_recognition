@@ -27,7 +27,7 @@ pip3 install -r requirements.txt
 [Download small dataset](https://app.roboflow.com/carstracksbus/cars-ljnwr/1)
 
 ### TO DO
-[] Add large dataset
+** Add large dataset **
 
 
 ### Walkthrough
@@ -82,9 +82,11 @@ If you want change number of epochs add argument `--epochs num_epochs`. Training
 | car     | 0.9206    | 0.8491 | 0.8834   |
 | truck   | 0.1667    | 0.2000 | 0.1818   |
 
+<br/>
+
 **Average Metrics for All Classes:**
 - Precision: 0.4027
 - Recall: 0.3778
 - F1 Score: 0.3890
 
-To ensure a balanced consideration of performance across all classes during calculation, adjust the 'average' parameter from `'macro'` to `'weighted'` within the `get_metrics` function.
+To ensure a balanced consideration of performance across all classes during calculation, adjust the 'average' parameter from  `'macro'`  to  `'weighted'`  within the  `get_metrics`  function.
