@@ -26,12 +26,9 @@ pip3 install -r requirements.txt
 
 [Download small dataset](https://app.roboflow.com/carstracksbus/cars-ljnwr/1)
 
-##### Large Dataset:
-    * Train set: 610 images
-    * Valid set: 120 images
-    * Test set: 70 images
+### TO DO
+[] Add large dataset
 
-[Download large dataset](https://app.roboflow.com/carstracksbus/cars-ljnwr/11)
 
 ### Walkthrough
 ```
@@ -51,7 +48,7 @@ pip3 install -r requirements.txt
 |---- video*.mp4
 ```
 
-**Rename `best_model_large.pth` or `best_model_small.pth` to `best_model.pth`**
+
 <br/>
 
 ### Validate model on video
@@ -76,16 +73,18 @@ If you want change number of epochs add argument `--epochs num_epochs`. Training
 
 <br/><br/>
 
-## Evaluation Metrics (model trained on large dataset by 200 epochs)
+
+## Performance Metrics
 
 | Class   | Precision | Recall | F1 Score |
 |---------|-----------|--------|----------|
-| bus     | 0.7875    | 0.7241 | 0.7545   |
-| car     | 0.9664    | 0.8895 | 0.9264   |
-| truck   | 0.5       | 0.25   | 0.3333   |
+| bus     | 0.5234    | 0.4621 | 0.4908   |
+| car     | 0.9206    | 0.8491 | 0.8834   |
+| truck   | 0.1667    | 0.2000 | 0.1818   |
 
 **Average Metrics for All Classes:**
-- Precision: 0.9425
-- Recall: 0.8664
-- F1 Score: 0.9027
+- Precision: 0.4027
+- Recall: 0.3778
+- F1 Score: 0.3890
 
+To ensure a balanced consideration of performance across all classes during calculation, adjust the 'average' parameter from `'macro'` to `'weighted'` within the `get_metrics` function.
