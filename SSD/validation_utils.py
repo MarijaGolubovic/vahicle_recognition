@@ -205,7 +205,7 @@ def get_metrics(test_loader, show_detection_result):
         print(f"Class: {class_name}")
         print(f"\t Precision: {precision[i]}\n\t Recall: {recall[i]}\n\t F1 Score: {f1_score[i]}")
     
-    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average='weighted', zero_division=0)
+    precision, recall, f1_score, _ = precision_recall_fscore_support(all_targets, all_predictions, labels=list(range(NUM_CLASSES)), average='macro', zero_division=0)
     print(f"\nAverage metrics for each classes: \n\t Precision: {precision}\n\t Recall: {recall}\n\t F1 Score: {f1_score}\n")
 
 
