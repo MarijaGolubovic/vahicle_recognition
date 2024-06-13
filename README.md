@@ -34,5 +34,10 @@ We have provided pre-trained models for both SSD and YOLO in the respective fold
 
 Feel free to reach out for any questions or concerns regarding the project.
 
+<video width="320" height="240" controls>
+  <source src="[link_do_videa.mp4](https://github.com/MarijaGolubovic/vahicle_recognition/pull/4/files#diff-5a35828a304dcac95bcec12fc56cb5db4bc2940c334e3ca1522f566d98a2d34e)" type="video/mp4">
+  Vaš pretraživač ne podržava prikaz ovog video zapisa.
+</video>
+
 
 
