@@ -15,6 +15,7 @@ import os
 import argparse
 from datetime import datetime
 
+# https://debuggercafe.com/train-ssd300-vgg16/
 
 
 """This class keeps track of the training and validation loss values
@@ -76,7 +77,7 @@ def main(args):
         get_metrics(test_loader, args.show)
 
     elif args.detect:
-        video(args.show)
+        video(args.show, args.video)
 
     elif args.train:
         current_time = datetime.now()
@@ -159,6 +160,7 @@ if __name__ == '__main__':
     parser.add_argument('--eval', action='store_true', help='Run evaluation mode')
     parser.add_argument('--show', action='store_true', help='Show detection result')
     parser.add_argument('--epochs', type=int, default=NUM_EPOCHS, help='Number of epochs for training') 
+    parser.add_argument('--video', type=str, help='Path to video')
 
     args = parser.parse_args()
 

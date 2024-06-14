@@ -45,7 +45,7 @@ def validate(valid_data_loader, model):
     metric_summary = metric.compute()
     return metric_summary
 
-def video(show_detection_result):
+def video(show_detection_result, video_path):
     os.makedirs('inference_outputs/videos', exist_ok=True)
 
     COLORS = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
@@ -55,12 +55,16 @@ def video(show_detection_result):
     model.to(DEVICE).eval()
 
     detection_threshold = 0.2
-
-    video_name = "test_video2.mkv"
+    if video_path == None:
+        video_name = "test_video2.mkv"
+    else:
+        video_name = video_path
     cap = cv2.VideoCapture(video_name)
 
+    print(f'[INFO] Video path {video_name}')
     if (cap.isOpened() == False):
-        print('Error while trying to read video. Please check path again')
+        print(f'[ERROR] Error while trying to read video. Please check path again {video_name}')
+        return
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
